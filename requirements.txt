@@ -1,0 +1,14 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-WTF==1.1.1
+WTForms==3.0.1
+Werkzeug==2.3.7
+Jinja2==3.1.2
+python-dateutil==2.8.2
+reportlab==4.0.4
+openpyxl==3.1.2
+xlsxwriter==3.1.9
+weasyprint==60.2
+pdfkit==1.0.0
+arabic-reshaper==3.0.0
+python-bidi==0.4.2
