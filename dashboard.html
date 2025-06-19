@@ -1,0 +1,552 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة التحكم - برنامج المحاسب الذكي{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="h3 mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            لوحة التحكم
+        </h1>
+    </div>
+</div>
+
+<!-- إحصائيات سريعة -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-right-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            العملاء
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.customers_count }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-right-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            الموردين
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.suppliers_count }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-truck fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-right-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            الأصناف
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.products_count }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-boxes fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-right-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            الفواتير
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.invoices_count }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-invoice fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إحصائيات مالية -->
+<div class="row mb-4">
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-right-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            إجمالي المبيعات
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ "{:,.2f}".format(stats.total_sales) }} ل.س
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-right-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            إجمالي المشتريات
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ "{:,.2f}".format(stats.total_purchases) }} ل.س
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-right-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            المدفوعات المعلقة
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ "{:,.2f}".format(stats.pending_payments) }} ل.س
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- آخر الفواتير -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">آخر الفواتير</h6>
+                <a href="#" class="btn btn-sm btn-primary">عرض الكل</a>
+            </div>
+            <div class="card-body">
+                {% if recent_invoices %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>رقم الفاتورة</th>
+                                    <th>النوع</th>
+                                    <th>العميل/المورد</th>
+                                    <th>المبلغ</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in recent_invoices %}
+                                <tr>
+                                    <td>{{ invoice.invoice_number }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if invoice.invoice_type == 'sale' else 'info' }}">
+                                            {{ 'مبيعات' if invoice.invoice_type == 'sale' else 'مشتريات' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {{ invoice.customer.name if invoice.customer else invoice.supplier.name if invoice.supplier else '-' }}
+                                    </td>
+                                    <td>{{ "{:,.2f}".format(invoice.total_amount) }} ل.س</td>
+                                    <td>{{ invoice.invoice_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if invoice.status == 'confirmed' else 'warning' if invoice.status == 'draft' else 'secondary' }}">
+                                            {{ 'مؤكدة' if invoice.status == 'confirmed' else 'مسودة' if invoice.status == 'draft' else invoice.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted">لا توجد فواتير حتى الآن</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- المنتجات منخفضة المخزون -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    منتجات منخفضة المخزون
+                    <span class="badge bg-warning ms-2">{{ stats.low_stock_products }}</span>
+                </h6>
+                {% if low_stock_products %}
+                <button class="btn btn-sm btn-outline-warning" onclick="refreshLowStockProducts()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                {% endif %}
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% if low_stock_products %}
+                    {% for product in low_stock_products %}
+                    <div class="alert alert-{{ product.urgency_color }} py-2 mb-2" role="alert">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center">
+                                    <div class="fw-bold text-dark">{{ product.name }}</div>
+                                    <span class="badge bg-{{ product.urgency_color }} ms-2 small">{{ product.urgency_text }}</span>
+                                    {% if product.is_out_of_stock %}
+                                    <i class="fas fa-exclamation-triangle text-danger ms-1" title="نفد المخزون"></i>
+                                    {% elif product.is_critical %}
+                                    <i class="fas fa-exclamation-circle text-warning ms-1" title="حرج جداً"></i>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-barcode me-1"></i>{{ product.code }}
+                                    {% if product.warehouse %}
+                                    | <i class="fas fa-warehouse me-1"></i>{{ product.warehouse.name }}
+                                    {% endif %}
+                                    {% if product.category %}
+                                    | <i class="fas fa-tags me-1"></i>{{ product.category }}
+                                    {% endif %}
+                                </small>
+                                <div class="mt-1">
+                                    <small class="text-info">
+                                        <i class="fas fa-boxes me-1"></i>
+                                        الكمية الحالية: {{ product.current_quantity }} {{ product.unit }}
+                                    </small>
+                                </div>
+                                <div class="mt-1">
+                                    <small class="text-danger">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        الحد الأدنى: {{ product.min_quantity }} {{ product.unit }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="mb-1">
+                                    <span class="badge bg-{{ product.urgency_color }} fs-6">
+                                        {{ product.current_quantity }} {{ product.unit }}
+                                    </span>
+                                </div>
+                                <div class="mb-1">
+                                    <span class="badge bg-danger fs-6">
+                                        نقص: {{ product.shortage }} {{ product.unit }}
+                                    </span>
+                                </div>
+                                {% if product.shortage_percentage > 0 %}
+                                <small class="text-{{ product.urgency_color }}">
+                                    <i class="fas fa-percentage me-1"></i>
+                                    {{ product.shortage_percentage }}%
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- شريط التقدم لإظهار مستوى المخزون -->
+                        {% set percentage = (product.current_quantity / product.min_quantity * 100) if product.min_quantity > 0 else 0 %}
+                        <div class="progress mt-2" style="height: 8px;">
+                            <div class="progress-bar bg-{{ product.urgency_color }}" role="progressbar"
+                                 style="width: {{ percentage if percentage <= 100 else 100 }}%"
+                                 aria-valuenow="{{ percentage }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted">
+                                المطلوب: {{ product.required_quantity }} {{ product.unit }}
+                                {% if product.estimated_cost > 0 %}
+                                | التكلفة: {{ "%.0f"|format(product.estimated_cost) }} ل.س
+                                {% endif %}
+                            </small>
+                            <small class="text-success">الحد الأدنى: {{ product.min_quantity }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- رابط لعرض جميع المنتجات منخفضة المخزون -->
+                    <div class="text-center mt-3">
+                        <a href="#" class="btn btn-sm btn-outline-warning" onclick="showAllLowStockProducts()">
+                            <i class="fas fa-list me-1"></i>
+                            عرض جميع المنتجات منخفضة المخزون
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                        <p class="text-success mb-0">جميع المنتجات في مستوى آمن</p>
+                        <small class="text-muted">لا توجد منتجات تحتاج إلى إعادة تموين</small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// تحديث المنتجات منخفضة المخزون
+function refreshLowStockProducts() {
+    const button = event.target.closest('button');
+    const icon = button.querySelector('i');
+
+    // إضافة تأثير الدوران
+    icon.classList.add('fa-spin');
+    button.disabled = true;
+
+    // محاكاة تحديث البيانات
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+// عرض جميع المنتجات منخفضة المخزون
+function showAllLowStockProducts() {
+    // إنشاء نافذة منبثقة لعرض جميع المنتجات منخفضة المخزون
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = 'lowStockModal';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        جميع المنتجات منخفضة المخزون
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="lowStockContent">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">جاري التحميل...</span>
+                            </div>
+                            <p class="mt-2">جاري تحميل البيانات...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-success" onclick="exportLowStockToExcel()">
+                        <i class="fas fa-file-excel me-2"></i>تصدير Excel
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" onclick="printLowStockReport()">
+                        <i class="fas fa-print me-2"></i>طباعة التقرير
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    const modalInstance = new bootstrap.Modal(modal);
+    modalInstance.show();
+
+    // تحميل البيانات
+    fetch('/api/low-stock-products')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayLowStockProducts(data);
+            } else {
+                document.getElementById('lowStockContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        خطأ في تحميل البيانات: ${data.error}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            document.getElementById('lowStockContent').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    خطأ في الاتصال: ${error.message}
+                </div>
+            `;
+        });
+
+    // إزالة النافذة عند الإغلاق
+    modal.addEventListener('hidden.bs.modal', function() {
+        document.body.removeChild(modal);
+    });
+}
+
+// عرض المنتجات منخفضة المخزون في النافذة المنبثقة
+function displayLowStockProducts(data) {
+    const content = document.getElementById('lowStockContent');
+
+    if (data.products.length === 0) {
+        content.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                <h5 class="text-success">جميع المنتجات في مستوى آمن</h5>
+                <p class="text-muted">لا توجد منتجات تحتاج إلى إعادة تموين</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <!-- إحصائيات سريعة -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h4>${data.critical_count}</h4>
+                        <small>نفد المخزون</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <h4>${data.high_count}</h4>
+                        <small>حرج جداً</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h4>${data.medium_count}</h4>
+                        <small>منخفض</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h4>${data.total_count}</h4>
+                        <small>إجمالي المنتجات</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- التكلفة المقدرة -->
+        <div class="alert alert-info">
+            <i class="fas fa-calculator me-2"></i>
+            <strong>التكلفة المقدرة لإعادة التموين:</strong> ${data.total_estimated_cost.toLocaleString()} ل.س
+        </div>
+
+        <!-- جدول المنتجات -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>الصنف</th>
+                        <th>الكود</th>
+                        <th>المخزن</th>
+                        <th>الكمية الحالية</th>
+                        <th>الحد الأدنى</th>
+                        <th>النقص</th>
+                        <th>المطلوب</th>
+                        <th>التكلفة المقدرة</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    data.products.forEach(product => {
+        html += `
+            <tr>
+                <td>
+                    <strong>${product.name}</strong>
+                    ${product.category !== 'غير محدد' ? `<br><small class="text-muted">${product.category}</small>` : ''}
+                </td>
+                <td><code>${product.code}</code></td>
+                <td>${product.warehouse_name}</td>
+                <td class="text-center">
+                    <span class="badge bg-${product.urgency_color}">${product.current_quantity} ${product.unit}</span>
+                </td>
+                <td class="text-center">${product.min_quantity} ${product.unit}</td>
+                <td class="text-center text-danger">${product.shortage} ${product.unit}</td>
+                <td class="text-center">${product.required_quantity} ${product.unit}</td>
+                <td class="text-end">${product.estimated_cost.toLocaleString()} ل.س</td>
+                <td class="text-center">
+                    <span class="badge bg-${product.urgency_color}">${product.urgency_text}</span>
+                    ${product.shortage_percentage > 0 ? `<br><small>${product.shortage_percentage}%</small>` : ''}
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    content.innerHTML = html;
+}
+
+// تحديث الإحصائيات كل 5 دقائق
+setInterval(function() {
+    // يمكن إضافة AJAX لتحديث الإحصائيات دون إعادة تحميل الصفحة
+    console.log('تحديث الإحصائيات...');
+}, 300000); // 5 دقائق
+
+// إضافة تأثيرات بصرية للمنتجات منخفضة المخزون
+document.addEventListener('DOMContentLoaded', function() {
+    const lowStockAlerts = document.querySelectorAll('.alert-warning');
+
+    lowStockAlerts.forEach((alert, index) => {
+        // إضافة تأثير الظهور التدريجي
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(20px)';
+            alert.style.transition = 'all 0.3s ease';
+
+            setTimeout(() => {
+                alert.style.opacity = '1';
+                alert.style.transform = 'translateY(0)';
+            }, 50);
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

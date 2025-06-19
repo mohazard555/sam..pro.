@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}قائمة العملاء - برنامج المحاسب الذكي{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">
+                <i class="fas fa-users me-2"></i>
+                قائمة العملاء
+            </h1>
+            <a href="{{ url_for('add_customer') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>
+                إضافة عميل جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- شريط البحث -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="GET" class="d-flex">
+            <input type="text" name="search" class="form-control" placeholder="البحث في العملاء..." value="{{ search }}">
+            <button type="submit" class="btn btn-outline-primary ms-2">
+                <i class="fas fa-search"></i>
+            </button>
+            {% if search %}
+            <a href="{{ url_for('customers') }}" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-times"></i>
+            </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- جدول العملاء -->
+<div class="card shadow">
+    <div class="card-body">
+        {% if customers.items %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الهاتف</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>الرصيد الحالي</th>
+                        <th>حد الائتمان</th>
+                        <th>تاريخ الإنشاء</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers.items %}
+                    <tr>
+                        <td>
+                            <strong>{{ customer.name }}</strong>
+                            {% if customer.tax_number %}
+                            <br><small class="text-muted">الرقم الضريبي: {{ customer.tax_number }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ customer.phone or '-' }}</td>
+                        <td>{{ customer.email or '-' }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'danger' if customer.current_balance > 0 else 'success' if customer.current_balance < 0 else 'secondary' }}">
+                                {{ "{:,.2f}".format(customer.current_balance) }} ل.س
+                                {% if customer.current_balance > 0 %}
+                                (مدين)
+                                {% elif customer.current_balance < 0 %}
+                                (دائن)
+                                {% else %}
+                                (متوازن)
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>{{ "{:,.2f}".format(customer.credit_limit) }} ل.س</td>
+                        <td>{{ customer.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('edit_customer', id=customer.id) }}" class="btn btn-sm btn-outline-primary" title="تعديل">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-outline-info" title="كشف حساب">
+                                    <i class="fas fa-file-alt"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="حذف" 
+                                        onclick="confirmDelete({{ customer.id }}, '{{ customer.name }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if customers.pages > 1 %}
+        <nav aria-label="صفحات العملاء">
+            <ul class="pagination justify-content-center">
+                {% if customers.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('customers', page=customers.prev_num, search=search) }}">السابق</a>
+                </li>
+                {% endif %}
+                
+                {% for page_num in customers.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != customers.page %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('customers', page=page_num, search=search) }}">{{ page_num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if customers.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('customers', page=customers.next_num, search=search) }}">التالي</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">لا توجد عملاء</h5>
+            {% if search %}
+            <p class="text-muted">لم يتم العثور على عملاء تطابق البحث "{{ search }}"</p>
+            <a href="{{ url_for('customers') }}" class="btn btn-outline-primary">عرض جميع العملاء</a>
+            {% else %}
+            <p class="text-muted">ابدأ بإضافة عميل جديد</p>
+            <a href="{{ url_for('add_customer') }}" class="btn btn-primary">إضافة عميل جديد</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal تأكيد الحذف -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تأكيد الحذف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف العميل <strong id="customerName"></strong>؟</p>
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    هذا الإجراء لا يمكن التراجع عنه
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">حذف</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(customerId, customerName) {
+    document.getElementById('customerName').textContent = customerName;
+    document.getElementById('deleteForm').action = '/customers/' + customerId + '/delete';
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}
